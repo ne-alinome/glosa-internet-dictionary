@@ -1,0 +1,4 @@
+= TO-DO of _Glosa Internet Directory_
+:author: Marcos Cruz (programandala.net)
+:revdate: 2018-12-06
+

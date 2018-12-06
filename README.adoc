@@ -1,0 +1,8 @@
+= Glosa Internet Dictionary
+:revdate: 2018-12-07
+
+The goal of this project is to build an e-book (in EPUB and other
+formats) from the contents of the http://glosa.org/gid[Glosa Internet
+Dictionary], in order to make it easier to use.
+
+Author: Marcos Cruz (programandala.net).
