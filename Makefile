@@ -2,7 +2,7 @@
 
 # By Marcos Cruz (programandala.net)
 
-# Last modified 201812091926
+# Last modified 201812092015
 # See change log at the end of the file
 
 # ==============================================================
@@ -39,34 +39,58 @@ bullet=>
 # Interface
 
 .PHONY: all
-all: epub html
+all: paragraphs_epub html
 
 .PHONY: clean
 clean:
 	rm -f target/* tmp/*
 
 .PHONY: data
-data: csv lists
+data: csv lists paragraphs linebreaks
 
 .PHONY: csv
 csv: tmp/engl.csv tmp/glen.csv
 
 .PHONY: lists
-csv: tmp/engl.list.adoc tmp/glen.list.adoc
+lists: tmp/engl.list.adoc tmp/glen.list.adoc
+
+.PHONY: paragraphs
+paragraphs: tmp/engl.paragraph.adoc tmp/glen.paragraph.adoc
+
+.PHONY: linebreaks
+linebreaks: tmp/engl.linebreak.adoc tmp/glen.linebreak.adoc
 
 .PHONY: epub
-epub: \
-	target/$(book).tables.adoc.xml.pandoc.epub \
-	target/$(book).lists.adoc.xml.pandoc.epub
+epub: paragraphs_epub lists_epub tables_epub
+
+.PHONY: paragraphs_epub
+paragraphs_epub: target/$(book).paragraphs.adoc.xml.pandoc.epub
+
+.PHONY: lists_epub
+lists_epub: target/$(book).lists.adoc.xml.pandoc.epub
+
+.PHONY: tables_epub
+tables_epub: target/$(book).tables.adoc.xml.pandoc.epub
+
+# XXX TODO --
+#	target/$(book).linebreaks.adoc.xml.pandoc.epub
 
 .PHONY: html
 html: \
-	target/$(book).tables.adoc.html \
-	target/$(book).tables.adoc.plain.html \
-	target/$(book).tables.adoc.xml.pandoc.html \
+	target/$(book).paragraphs.adoc.html \
+	target/$(book).paragraphs.adoc.plain.html \
+	target/$(book).paragraphs.adoc.xml.pandoc.html \
 	target/$(book).lists.adoc.html \
 	target/$(book).lists.adoc.plain.html \
-	target/$(book).lists.adoc.xml.pandoc.html
+	target/$(book).lists.adoc.xml.pandoc.html \
+	target/$(book).tables.adoc.html \
+	target/$(book).tables.adoc.plain.html \
+	target/$(book).tables.adoc.xml.pandoc.html
+
+# XXX TODO --
+#	target/$(book).linebreaks.adoc.html \
+#	target/$(book).linebreaks.adoc.plain.html \
+#	target/$(book).linebreaks.adoc.xml.pandoc.html \
 
 # ==============================================================
 # Convert the original data files
@@ -181,13 +205,40 @@ tmp/%.txt: original/%.txt.gz Makefile
 # ----------------------------------------------
 # Convert into Asciidoctor unordered lists
 
-# The '%' comments are removed and the encoding is changed to UTF-8 (required
-# by all target formats). Some text manipulations are required as well.
-
 %.list.adoc: %.txt
 	cat $< \
 	| sed \
 		-e 's/\(.*\S\{1,\}\)   *\(.\+\S\) *$$/\* $(bullet)|\1\|: |\2|/' \
+		-e 's/\(|\|; \)\([^|;]\{1,\}\)\s\[\([^|;]\{1,\}\)\s]/\1\3 \2/g' \
+		-e 's/\(|\|; \)\([^|;]\{1,\}\)\[\([^|;]\{1,\}\)]/\1\3\2/g' \
+		-e 's/\(\*\?\<1\?+\{0,2\}\*\?G\?X\?\)\([|;]\)/[\1]\2/g' \
+		-e 's/\([|;]\)\([^|;]\+\); \2\([|;]\)/\1\2\3/' \
+		-e 's/|//g' \
+	> $@
+
+# ----------------------------------------------
+# Convert into Asciidoctor paragraph with line breaks
+
+# XXX FIXME -- This does not work. See details in the TO-DO file.
+
+%.linebreak.adoc: %.txt
+	cat $< \
+	| sed \
+		-e 's/\(.*\S\{1,\}\)   *\(.\+\S\) *$$/$(bullet)|\1\|: |\2| +/' \
+		-e 's/\(|\|; \)\([^|;]\{1,\}\)\s\[\([^|;]\{1,\}\)\s]/\1\3 \2/g' \
+		-e 's/\(|\|; \)\([^|;]\{1,\}\)\[\([^|;]\{1,\}\)]/\1\3\2/g' \
+		-e 's/\(\*\?\<1\?+\{0,2\}\*\?G\?X\?\)\([|;]\)/[\1]\2/g' \
+		-e 's/\([|;]\)\([^|;]\+\); \2\([|;]\)/\1\2\3/' \
+		-e 's/|//g' \
+	> $@
+
+# ----------------------------------------------
+# Convert into Asciidoctor paragraphs
+
+%.paragraph.adoc: %.txt
+	cat $< \
+	| sed \
+		-e 's/\(.*\S\{1,\}\)   *\(.\+\S\) *$$/$(bullet)|\1\|: |\2|\n/' \
 		-e 's/\(|\|; \)\([^|;]\{1,\}\)\s\[\([^|;]\{1,\}\)\s]/\1\3 \2/g' \
 		-e 's/\(|\|; \)\([^|;]\{1,\}\)\[\([^|;]\{1,\}\)]/\1\3\2/g' \
 		-e 's/\(\*\?\<1\?+\{0,2\}\*\?G\?X\?\)\([|;]\)/[\1]\2/g' \
@@ -202,11 +253,29 @@ tmp/%.txt: original/%.txt.gz Makefile
 # `include::` macros will integrate the CSV files during the translation into
 # DocBook or HTML:
 
-target/$(book).tables.adoc: tmp/engl.csv tmp/glen.csv src/$(book).common.adoc
+target/$(book).tables.adoc: \
+		tmp/engl.csv \
+		tmp/glen.csv \
+		src/$(book).common.adoc
 	cp src/glosa_internet_dictionary.tables.adoc $@
 
-target/$(book).lists.adoc: tmp/engl.list.adoc tmp/glen.list.adoc src/$(book).common.adoc
+target/$(book).lists.adoc: \
+		tmp/engl.list.adoc \
+		tmp/glen.list.adoc \
+		src/$(book).common.adoc
 	cp src/glosa_internet_dictionary.lists.adoc $@
+
+target/$(book).paragraphs.adoc: \
+		tmp/engl.paragraph.adoc \
+		tmp/glen.paragraph.adoc \
+		src/$(book).common.adoc
+	cp src/glosa_internet_dictionary.paragraphs.adoc $@
+
+target/$(book).linebreaks.adoc: \
+		tmp/engl.linebreak.adoc \
+		tmp/glen.linebreak.adoc \
+		src/$(book).common.adoc
+	cp src/glosa_internet_dictionary.linebreaks.adoc $@
 
 # ==============================================================
 # Convert to DocBook
@@ -275,5 +344,6 @@ target/$(book).lists.adoc: tmp/engl.list.adoc tmp/glen.list.adoc src/$(book).com
 #
 # Mark entries with a hardcoded bullet, in order to make searches easier.
 #
-# Build a variant target, using lists instead of tables. The result is much
-# faster to render by the e-reader.
+# Build a variant target, using lists, which the e-reader renders much faster
+# than tables.  Build also a target using paragraphs, which is even a bit
+# faster.

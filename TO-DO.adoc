@@ -13,3 +13,36 @@ should be '1*' instead of '*1'. It doesn't seem to mean "words not
 original GEO (Clark/Ashby)", because there's also a "1" (words that
 appear in one of the several "Glosa 1000" lists).
 
+== 2018-12-09
+
+The line breaks does not work.
+
+The converted data is right:
+
+----
+>apparent: feno [1++G] +
+>appeal: petitio [1++] +
+>appear: feno [1++G]; surge [1++]; monstra se [1+]; apare [1]; gene vista [1] +
+>appearance: feno [1++G] +
+>appease: apaci +
+>appendix: apendici [1] +
+>appetite: fo-volu [1++]; apetiti [1+]; libido [1+]; apeti [1] +
+>applaud: lauda [1++]; soni lauda [1+]; aplaude (prefer lauda) +
+>applause: toribo [G] +
+----
+
+But the conversion to DocBook fails:
+
+----
+&gt;apparent: feno [1G]<?asciidoc-br?>
+&gt;appeal: petitio [1] +
+&gt;appear: feno [1G]; surge [1]; monstra se [1+]; apare [1]; gene vista [1] +
+&gt;appearance: feno [1G]<?asciidoc-br?>
+&gt;appease: apaci<?asciidoc-br?>
+&gt;appendix: apendici [1]<?asciidoc-br?>
+&gt;appetite: fo-volu [1]; apetiti [1+]; libido [1+]; apeti [1] +
+&gt;applaud: lauda [1]; soni lauda [1+]; aplaude (prefer lauda)<?asciidoc-br?>
+&gt;applause: toribo [G]<?asciidoc-br?>
+----
+
+And anyway `<?asciidoc-br?>` is not recognized by pandoc.

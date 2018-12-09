@@ -1,0 +1,11 @@
+include::../src/glosa_internet_dictionary.common.adoc[]
+
+// English - Glosa {{{1
+== English - Glosa
+
+include::../tmp/engl.paragraph.adoc[]
+
+// Glosa - English {{{1
+== Glosa - English
+
+include::../tmp/glen.paragraph.adoc[]
