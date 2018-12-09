@@ -66,18 +66,3 @@ Other abbreviations:
 `n`:: noun
 `v`:: verb
 
-// English - Glosa {{{1
-== English - Glosa
-
-[format="csv"]
-|===
-include::../tmp/engl.csv[]
-|===
-
-// Glosa - English {{{1
-== Glosa - English
-
-[format="csv"]
-|===
-include::../tmp/glen.csv[]
-|===

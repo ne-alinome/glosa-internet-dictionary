@@ -2,7 +2,7 @@
 
 # By Marcos Cruz (programandala.net)
 
-# Last modified 201812091802
+# Last modified 201812091926
 # See change log at the end of the file
 
 # ==============================================================
@@ -45,33 +45,49 @@ all: epub html
 clean:
 	rm -f target/* tmp/*
 
+.PHONY: data
+data: csv lists
+
 .PHONY: csv
 csv: tmp/engl.csv tmp/glen.csv
 
+.PHONY: lists
+csv: tmp/engl.list.adoc tmp/glen.list.adoc
+
 .PHONY: epub
 epub: \
-	target/$(book).adoc.xml.pandoc.epub
+	target/$(book).tables.adoc.xml.pandoc.epub \
+	target/$(book).lists.adoc.xml.pandoc.epub
 
 .PHONY: html
 html: \
-	target/$(book).adoc.html \
-	target/$(book).adoc.plain.html \
-	target/$(book).adoc.xml.pandoc.html
+	target/$(book).tables.adoc.html \
+	target/$(book).tables.adoc.plain.html \
+	target/$(book).tables.adoc.xml.pandoc.html \
+	target/$(book).lists.adoc.html \
+	target/$(book).lists.adoc.plain.html \
+	target/$(book).lists.adoc.xml.pandoc.html
 
 # ==============================================================
-# Convert to Asciidoctor
+# Convert the original data files
 
 # ----------------------------------------------
+# Basic tidy
 
-# The original text files are converted to CSV (Comma Separated Values) files.
-# The '%' comments are removed and the encoding is changed to UTF-8 (required
-# by all target formats). Some text manipulations are required as well.
+# The encoding of the original data files is changed to UTF-8 (required by all
+# target formats), and the comment lines are removed.
 
-tmp/%.csv: original/%.txt.gz Makefile
+tmp/%.txt: original/%.txt.gz Makefile
 	zcat $< \
 	| iconv --from-code latin1 --to-code utf-8 \
 	| grep --invert-match "^%" \
-	| tr '[{}]' '[()]' \
+	| tr '[{}]' '[()]' > $@
+
+# ----------------------------------------------
+# Convert into CSV (Comma Separated Values)
+
+%.csv: %.txt
+	cat $< \
 	| sed \
 		-e "s/\(.*\S\{1,\}\)   *\(.\+\S\) *$$/\"$(bullet)\1\",\"\2\"/" \
 		-e 's/\("\|; \)\([^";]\{1,\}\)\s\[\([^";]\{1,\}\)\s]/\1\3 \2/g' \
@@ -163,13 +179,34 @@ tmp/%.csv: original/%.txt.gz Makefile
 #		-e 's/\("\|; \)\([^";]\{1,\}\)\(\s\)\?\[\([^";]\{1,\}\)\3]/\1\4\3\2/g' \
 
 # ----------------------------------------------
+# Convert into Asciidoctor unordered lists
+
+# The '%' comments are removed and the encoding is changed to UTF-8 (required
+# by all target formats). Some text manipulations are required as well.
+
+%.list.adoc: %.txt
+	cat $< \
+	| sed \
+		-e 's/\(.*\S\{1,\}\)   *\(.\+\S\) *$$/\* $(bullet)|\1\|: |\2|/' \
+		-e 's/\(|\|; \)\([^|;]\{1,\}\)\s\[\([^|;]\{1,\}\)\s]/\1\3 \2/g' \
+		-e 's/\(|\|; \)\([^|;]\{1,\}\)\[\([^|;]\{1,\}\)]/\1\3\2/g' \
+		-e 's/\(\*\?\<1\?+\{0,2\}\*\?G\?X\?\)\([|;]\)/[\1]\2/g' \
+		-e 's/\([|;]\)\([^|;]\+\); \2\([|;]\)/\1\2\3/' \
+		-e 's/|//g' \
+	> $@
+
+# ==============================================================
+# Convert to Asciidoctor
 
 # The Asciidoctor source is simply copied into the target directory.  Its
 # `include::` macros will integrate the CSV files during the translation into
 # DocBook or HTML:
 
-%.adoc: tmp/engl.csv tmp/glen.csv
-	cp src/glosa_internet_dictionary.adoc $@
+target/$(book).tables.adoc: tmp/engl.csv tmp/glen.csv src/$(book).common.adoc
+	cp src/glosa_internet_dictionary.tables.adoc $@
+
+target/$(book).lists.adoc: tmp/engl.list.adoc tmp/glen.list.adoc src/$(book).common.adoc
+	cp src/glosa_internet_dictionary.lists.adoc $@
 
 # ==============================================================
 # Convert to DocBook
@@ -225,8 +262,18 @@ tmp/%.csv: original/%.txt.gz Makefile
 # Asciidoctor source. This makes it possible to update the e-book whenever the
 # original data is updated in glosa.org.
 #
-# 2018-12-09: Finish the regular expressions that rearrange the parts in
-# brackets. Put the notes of word origins into brackets. Make a rule to build
-# both CSV files, using Makefile as prerrequisite; this makes testing easier.
-# Remove duplicated meanings caused by variants in brackets. Mark entries with
-# a hardcoded bullet, in order to make searches easier.
+# 2018-12-09:
+#
+# Finish the regular expressions that rearrange the parts in brackets.
+#
+# Put the notes of word origins into brackets.
+#
+# Make a rule to build both CSV files, using Makefile as prerrequisite; this
+# makes testing easier.
+#
+# Remove duplicated meanings caused by variants in brackets.
+#
+# Mark entries with a hardcoded bullet, in order to make searches easier.
+#
+# Build a variant target, using lists instead of tables. The result is much
+# faster to render by the e-reader.
