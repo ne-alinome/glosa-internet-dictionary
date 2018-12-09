@@ -2,7 +2,7 @@
 
 # By Marcos Cruz (programandala.net)
 
-# Last modified 201812091645
+# Last modified 201812091703
 # See change log at the end of the file
 
 # ==============================================================
@@ -33,6 +33,9 @@ all: epub html
 clean:
 	rm -f target/* tmp/*
 
+.PHONY: csv
+csv: tmp/engl.csv tmp/glen.csv
+
 .PHONY: epub
 epub: \
 	target/$(book).adoc.xml.pandoc.epub
@@ -52,7 +55,7 @@ html: \
 # The '%' comments are removed and the encoding is changed to UTF-8 (required
 # by all target formats). Some text manipulations are required as well.
 
-tmp/%.csv: original/%.txt.gz
+tmp/%.csv: original/%.txt.gz Makefile
 	zcat $< \
 	| iconv --from-code latin1 --to-code utf-8 \
 	| grep --invert-match "^%" \
@@ -209,4 +212,5 @@ tmp/%.csv: original/%.txt.gz
 # original data is updated in glosa.org.
 #
 # 2018-12-09: Finish the regular expressions that rearrange the parts in
-# brackets. Put the notes of word origins into brackets.
+# brackets. Put the notes of word origins into brackets. Make a rule to build
+# both CSV files, using Makefile as prerrequisite; this makes testing easier.
