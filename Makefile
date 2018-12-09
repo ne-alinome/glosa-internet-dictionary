@@ -2,7 +2,7 @@
 
 # By Marcos Cruz (programandala.net)
 
-# Last modified 201812091745
+# Last modified 201812091802
 # See change log at the end of the file
 
 # ==============================================================
@@ -21,7 +21,19 @@
 
 VPATH=./src:./target:./original
 
+# ----------------------------------------------
+
 book=glosa_internet_dictionary
+
+# ----------------------------------------------
+
+# Set the mark which will be added at the start of every entry, in order to
+# facilitate searches in e-books, where regexp are not available. I.e.
+# searching the book for "word" will find the string "word" in any position of
+# the text, including as part of longer words, but searching for ">word" will
+# find only the dictionary entry.
+
+bullet=>
 
 # ==============================================================
 # Interface
@@ -61,7 +73,7 @@ tmp/%.csv: original/%.txt.gz Makefile
 	| grep --invert-match "^%" \
 	| tr '[{}]' '[()]' \
 	| sed \
-		-e "s/\(.*\S\{1,\}\)   *\(.\+\S\) *$$/\"\1\",\"\2\"/" \
+		-e "s/\(.*\S\{1,\}\)   *\(.\+\S\) *$$/\"$(bullet)\1\",\"\2\"/" \
 		-e 's/\("\|; \)\([^";]\{1,\}\)\s\[\([^";]\{1,\}\)\s]/\1\3 \2/g' \
 		-e 's/\("\|; \)\([^";]\{1,\}\)\[\([^";]\{1,\}\)]/\1\3\2/g' \
 		-e 's/\(\*\?\<1\?+\{0,2\}\*\?G\?X\?\)\([";]\)/[\1]\2/g' \
@@ -216,4 +228,5 @@ tmp/%.csv: original/%.txt.gz Makefile
 # 2018-12-09: Finish the regular expressions that rearrange the parts in
 # brackets. Put the notes of word origins into brackets. Make a rule to build
 # both CSV files, using Makefile as prerrequisite; this makes testing easier.
-# Remove duplicated meanings caused by variants in brackets.
+# Remove duplicated meanings caused by variants in brackets. Mark entries with
+# a hardcoded bullet, in order to make searches easier.
