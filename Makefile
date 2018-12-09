@@ -2,7 +2,7 @@
 
 # By Marcos Cruz (programandala.net)
 
-# Last modified 201812091703
+# Last modified 201812091722
 # See change log at the end of the file
 
 # ==============================================================
@@ -64,7 +64,7 @@ tmp/%.csv: original/%.txt.gz Makefile
 		-e "s/\(.*\S\{1,\}\)   *\(.\+\S\) *$$/\"\1\",\"\2\"/" \
 		-e 's/\("\|; \)\([^";]\{1,\}\)\s\[\([^";]\{1,\}\)\s]/\1\3 \2/g' \
 		-e 's/\("\|; \)\([^";]\{1,\}\)\[\([^";]\{1,\}\)]/\1\3\2/g' \
-		-e 's/\(\*\?\<1\?+\{0,2\}\*\?G\?X\?\)"/[\1]"/g' \
+		-e 's/\(\*\?\<1\?+\{0,2\}\*\?G\?X\?\)\([";]\)/[\1]\2/g' \
 	> $@
 
 # Description of the regular expressions done by `sed`:
@@ -84,11 +84,11 @@ tmp/%.csv: original/%.txt.gz Makefile
 #
 # The 4th regular expression:
 #
-#		-e 's/\<\(1\?+\{0,2\}\*\?G\?X\?\)"/[\1]"/g' \
+#		-e 's/\<\(1\?+\{0,2\}\*\?G\?X\?\)[";]/[\1]\2"/g' \
 #
 # has been temporarily modified in order to catch that case:
 #
-#		-e 's/\(\*\?\<1\?+\{0,2\}\*\?G\?X\?\)"/[\1]"/g' \
+#		-e 's/\(\*\?\<1\?+\{0,2\}\*\?G\?X\?\)[";]/[\1]\2"/g' \
 
 # XXX REMARK -- This CSV line
 #
