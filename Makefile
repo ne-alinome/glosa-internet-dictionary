@@ -2,7 +2,7 @@
 
 # By Marcos Cruz (programandala.net)
 
-# Last modified 201812091722
+# Last modified 201812091745
 # See change log at the end of the file
 
 # ==============================================================
@@ -65,6 +65,7 @@ tmp/%.csv: original/%.txt.gz Makefile
 		-e 's/\("\|; \)\([^";]\{1,\}\)\s\[\([^";]\{1,\}\)\s]/\1\3 \2/g' \
 		-e 's/\("\|; \)\([^";]\{1,\}\)\[\([^";]\{1,\}\)]/\1\3\2/g' \
 		-e 's/\(\*\?\<1\?+\{0,2\}\*\?G\?X\?\)\([";]\)/[\1]\2/g' \
+		-e 's/\([";]\)\([^";]\+\); \2\([";]\)/\1\2\3/' \
 	> $@
 
 # Description of the regular expressions done by `sed`:
@@ -75,7 +76,8 @@ tmp/%.csv: original/%.txt.gz Makefile
 # 3: Idem with the special cases, when there's no space in the brackets,
 #    e.g. parens and hyphens.
 # 4: Put the notation of word's origin in brackets.
-# 5: Replace notation '(=' with "(→". Temporarily removed, until the
+# 5: Remove repeated meanings caused by variants in brackets.
+# 6: Replace notation '(=' with "(→". Temporarily removed, until the
 #    distiction between notations "=" and "prefer" is clear:
 #		-e "s/(=/(→/g" \
 
@@ -214,3 +216,4 @@ tmp/%.csv: original/%.txt.gz Makefile
 # 2018-12-09: Finish the regular expressions that rearrange the parts in
 # brackets. Put the notes of word origins into brackets. Make a rule to build
 # both CSV files, using Makefile as prerrequisite; this makes testing easier.
+# Remove duplicated meanings caused by variants in brackets.
