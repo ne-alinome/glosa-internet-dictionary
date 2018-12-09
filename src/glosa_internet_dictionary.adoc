@@ -1,7 +1,7 @@
 = Glosa Internet Dictionary
-:revdate: 2018-12-08
+:revdate: 2018-12-09
 
-// Last modified 201812082303
+// Last modified 201812091639
 
 // This text document is written in Asciidoctor format
 // See http://asciidoctor.org
@@ -61,11 +61,10 @@ Other abbreviations:
 `1`:: "Glosa 1000" (words that appear in one of the several "Glosa 1000" lists)
 `*`:: words not original GEO (Clark/Ashby)
 `1*`:: words slightly modificated from Glosa-1000-words
-`X`:: words to be avoided (in brackets {=...} the prefered synonym}
+`X`:: words to be avoided; in brackets, the prefered synonym
 `adj`:: adjective
 `n`:: noun
 `v`:: verb
-`word2 [word1]` :: word1 word2
 
 // English - Glosa {{{1
 == English - Glosa

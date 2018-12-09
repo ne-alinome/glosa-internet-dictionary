@@ -1,9 +1,33 @@
 = TO-DO of _Glosa Internet Directory_
 :author: Marcos Cruz (programandala.net)
-:revdate: 2018-12-06
+:revdate: 2018-12-09
 
 
 == 2018-12-09
 
-Finish the `sed` regular expressions needed to manipulate the brackets
-of the original data files.
+This CSV line
+
+----
+"aito G","burnt brown; brown [burnt ]"
+----
+
+becomes this one after moving the parts in brackets:
+
+----
+"aito [G]","burnt brown; burnt brown"
+----
+
+It's goal is to show "burnt brown" under "brown".  There are other
+similar cases.  The repetions must be removed.
+
+== 2018-12-09
+
+Improve the "prefer" notation with a different arrow.
+
+== 2018-12-09
+
+Consult: It seems there's a typo in GID: the description of 'akademi'
+should be '1*' instead of '*1'. It doesn't seem to mean "words not
+original GEO (Clark/Ashby)", because there's also a "1" (words that
+appear in one of the several "Glosa 1000" lists).
+
