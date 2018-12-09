@@ -2,7 +2,7 @@
 
 # By Marcos Cruz (programandala.net)
 
-# Last modified 201812090006
+# Last modified 201812091553
 # See change log at the end of the file
 
 # ==============================================================
@@ -55,16 +55,36 @@ tmp/%.csv: original/%.txt.gz
 	| tr '[{}]' '[()]' \
 	| sed \
 		-e "s/\(.*\S\{1,\}\)   *\(.\+\S\) *$$/\"\1\",\"\2\"/" \
-		-e "s/\(.\)\([^\";]\{1,\}\)\( *\)\[\(.\{1,\}\)]/\1\4\3\2/g" \
+		-e 's/\("\|; \)\([^";]\{1,\}\)\s\[\([^";]\{1,\}\)\s]/\1\3 \2/g' \
+		-e 's/\("\|; \)\([^";]\{1,\}\)\[\([^";]\{1,\}\)]/\1\3\2/g' \
 	> $@
 
-# XXX FIXME -- The moving of the brackets (the second expression of the `sed`
-# command) does not work fine yet:
+# XXX OLD -- Tries:
 
 # This moves the contents of the brackets to the start of the line:
 #		-e "s/\([\";]\)\(.\+\)\( *\)\[\(.\{1,\}\)]/\1\4\3\2/" \
 # This fails only in some cases:
 #		-e "s/\(.\)\([^\";]\{1,\}\)\( *\)\[\(.\{1,\}\)]/\1\4\3\2/g" \
+# This fails only in some cases, no difference:
+#		-e "s/\(.\)\([^\";]\{1,\}\)\( *\)\[\(.\{1,\}\)]/\1\4\2/g" \
+# This do nothing:
+#		-e "s/\(\(\"\|; \)\{1,\}\)\s\[\(.\{1,\}\)\s]/\2\1/g" \
+# This remove the brackets:
+#		-e "s/\(\"\|; \)\(.\+\)\s\[\(.\{1,\}\)\s]/\1\3\2/g" \
+# This converts brackets separated with spaces, but fails
+# when there are two cases on the same line. Besides, it ignores
+# other brackets, e.g. with hyphens:
+#		-e 's/\("\|; \)\([^";,]\{1,\}\)\s\[\(.\{1,\}\)\s]/\1\3 \2/g' \
+# This works fine with several cases on the same line:
+#		-e 's/\("\|; \)\([^";,]\{1,\}\)\s\[\([^";,]\{1,\}\)\s]/\1\3 \2/g' \
+# This additional command replaces the spaceless brackets, e.g. hyphens,
+# but misses the special case of 'komo' (because it has a comma in the brackets):
+#		-e 's/\("\|; \)\([^";,]\{1,\}\)\[\([^";,]\{1,\}\)]/\1\3\2/g' \
+# This pair of commands replaces all brackets:
+#		-e 's/\("\|; \)\([^";]\{1,\}\)\s\[\([^";]\{1,\}\)\s]/\1\3 \2/g' \
+#		-e 's/\("\|; \)\([^";]\{1,\}\)\[\([^";]\{1,\}\)]/\1\3\2/g' \
+# This combined form ignores the spaceless brackets:
+#		-e 's/\("\|; \)\([^";]\{1,\}\)\(\s\)\?\[\([^";]\{1,\}\)\3]/\1\4\3\2/g' \
 
 # ----------------------------------------------
 
@@ -128,3 +148,6 @@ tmp/%.csv: original/%.txt.gz
 # 2018-12-08: Rewrite.  Use the original data files to build the tables of the
 # Asciidoctor source. This makes it possible to update the e-book whenever the
 # original data is updated in glosa.org.
+#
+# 2018-12-09: Finish the regular expressions that rearrage the parts in
+# brackets.
