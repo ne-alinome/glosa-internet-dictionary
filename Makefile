@@ -2,7 +2,7 @@
 
 # By Marcos Cruz (programandala.net)
 
-# Last modified 201812092015
+# Last modified 201812112321
 # See change log at the end of the file
 
 # ==============================================================
@@ -50,6 +50,14 @@ data: csv lists paragraphs linebreaks
 
 .PHONY: csv
 csv: tmp/engl.csv tmp/glen.csv
+
+.PHONY: jargon
+jargon: tmp/engl.jargon tmp/glen.jargon
+
+.PHONY: dict
+dict: \
+	target/$(book)_eng-glosa.dict.dz \
+	target/$(book)_glosa-eng.dict.dz
 
 .PHONY: lists
 lists: tmp/engl.list.adoc tmp/glen.list.adoc
@@ -110,10 +118,17 @@ tmp/%.txt: original/%.txt.gz Makefile
 # ----------------------------------------------
 # Convert into CSV (Comma Separated Values)
 
+# CSV format (with bullet '>' prefix added):
+#
+# -------------------
+# ">word1","definition 1"
+# ">word2","definition 2"
+# -------------------
+
 %.csv: %.txt
 	cat $< \
 	| sed \
-		-e "s/\(.*\S\{1,\}\)   *\(.\+\S\) *$$/\"$(bullet)\1\",\"\2\"/" \
+		-e 's/\(.*\S\{1,\}\)   *\(.\+\S\) *$$/"$(bullet)\1","\2"/' \
 		-e 's/\("\|; \)\([^";]\{1,\}\)\s\[\([^";]\{1,\}\)\s]/\1\3 \2/g' \
 		-e 's/\("\|; \)\([^";]\{1,\}\)\[\([^";]\{1,\}\)]/\1\3\2/g' \
 		-e 's/\(\*\?\<1\?+\{0,2\}\*\?G\?X\?\)\([";]\)/[\1]\2/g' \
@@ -203,6 +218,26 @@ tmp/%.txt: original/%.txt.gz Makefile
 #		-e 's/\("\|; \)\([^";]\{1,\}\)\(\s\)\?\[\([^";]\{1,\}\)\3]/\1\4\3\2/g' \
 
 # ----------------------------------------------
+# Convert into Jargon format
+
+# Jargon format:
+#
+# -------------------
+# :word1:definition 1
+# :word2:definition 2
+# -------------------
+
+%.jargon: %.txt
+	cat $< \
+	| sed \
+		-e 's/\(.*\S\{1,\}\)   *\(.\+\S\) *$$/:\1:\2/' \
+		-e 's/\(:\|; \)\([^:;]\{1,\}\)\s\[\([^:;]\{1,\}\)\s]/\1\3 \2/g' \
+		-e 's/\(:\|; \)\([^:;]\{1,\}\)\[\([^:;]\{1,\}\)]/\1\3\2/g' \
+		-e 's/\(\*\?\<1\?+\{0,2\}\*\?G\?X\?\)\([:;]\)/[\1]\2/g' \
+		-e 's/\([:;]\)\([^:;]\+\); \2\([:;]\)/\1\2\3/' \
+	> $@
+
+# ----------------------------------------------
 # Convert into Asciidoctor unordered lists
 
 %.list.adoc: %.txt
@@ -245,6 +280,39 @@ tmp/%.txt: original/%.txt.gz Makefile
 		-e 's/\([|;]\)\([^|;]\+\); \2\([|;]\)/\1\2\3/' \
 		-e 's/|//g' \
 	> $@
+
+# ==============================================================
+# Convert to dict and install it
+
+target/$(book)_eng-glosa.dict: tmp/engl.jargon
+	dictfmt \
+		--utf8 \
+		--allchars \
+		-s "Glosa Internet Dictionary (English-Glosa)" \
+		-j $(basename $@) \
+		< $<
+
+target/$(book)_glosa-eng.dict: tmp/glen.jargon
+	dictfmt \
+		--utf8 \
+		--allchars \
+		-s "Glosa Internet Dictionary (Glosa-English)" \
+		-j $(basename $@) \
+		< $<
+
+%.dict.dz: %.dict
+	dictzip --force $<
+
+.PHONY: installdict
+installdict: \
+	target/$(book)_eng-glosa.dict.dz \
+	target/$(book)_glosa-eng.dict.dz
+	cp --force \
+		$^ \
+		$(addsuffix .index, $(basename $(basename $^))) \
+		/usr/share/dictd/
+	/usr/sbin/dictdconfig --write
+	/etc/init.d/dictd restart
 
 # ==============================================================
 # Convert to Asciidoctor
@@ -347,3 +415,9 @@ target/$(book).linebreaks.adoc: \
 # Build a variant target, using lists, which the e-reader renders much faster
 # than tables.  Build also a target using paragraphs, which is even a bit
 # faster.
+#
+# 2018-12-11:
+#
+# Convert to dict format. The process is not fully working yet: The description
+# of the Glosa words must be moved to the second field, otherwise it's
+# considered part of the word.

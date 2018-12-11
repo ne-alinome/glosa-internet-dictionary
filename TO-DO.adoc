@@ -1,6 +1,6 @@
 = TO-DO of _Glosa Internet Directory_
 :author: Marcos Cruz (programandala.net)
-:revdate: 2018-12-09
+:revdate: 2018-12-11
 
 == 2018-12-09
 
@@ -46,3 +46,13 @@ But the conversion to DocBook fails:
 ----
 
 And anyway `<?asciidoc-br?>` is not recognized by pandoc.
+
+== 2018-12-11
+
+Fix the conversion to dict: The description of the Glosa words must be
+moved to the second field, otherwise it's considered part of the word.
+
+Fix: the temporary text files created by `tmp/%.txt: original/%.txt.gz
+Makefile` are removed at the end. Why? This makes the conversions be
+repeated, even when the original data didn't change.
+
