@@ -2,7 +2,7 @@
 
 # By Marcos Cruz (programandala.net)
 
-# Last modified 201812112321
+# Last modified 201812120057
 # See change log at the end of the file
 
 # ==============================================================
@@ -52,7 +52,7 @@ data: csv lists paragraphs linebreaks
 csv: tmp/engl.csv tmp/glen.csv
 
 .PHONY: jargon
-jargon: tmp/engl.jargon tmp/glen.jargon
+jargon: tmp/engl.jargon.txt tmp/glen.jargon.txt
 
 .PHONY: dict
 dict: \
@@ -103,17 +103,57 @@ html: \
 # ==============================================================
 # Convert the original data files
 
+# NOTE: The `.SECONDARY` special target prevents intermediate files from being
+# removed at the end.  See section "10.4 Chains of Implicit Rules" of the GNU
+# make manual.
+
 # ----------------------------------------------
 # Basic tidy
 
 # The encoding of the original data files is changed to UTF-8 (required by all
-# target formats), and the comment lines are removed.
+# target formats), comment lines are removed and curly brackets are changed to
+# parens.
+
+.SECONDARY: tmp/engl.txt tmp/glen.txt
 
 tmp/%.txt: original/%.txt.gz Makefile
 	zcat $< \
 	| iconv --from-code latin1 --to-code utf-8 \
 	| grep --invert-match "^%" \
 	| tr '[{}]' '[()]' > $@
+
+# ----------------------------------------------
+# Special tidy for dict
+
+# The encoding of the original data files is changed to UTF-8 (required by all
+# target formats) and comment lines are removed.
+#
+# Also, the comments in curly brackets are moved from the word to the
+# definition. Otherwise they have to be included in the search term.
+
+.SECONDARY: tmp/engl.dict_tidy.txt tmp/glen.dict_tidy.txt
+
+# XXX UNDER DEVELOPMENT
+
+# A temporary field separator.
+# Any combination of characters which is not in the file is valid.
+separator=ññññ
+
+tmp/%.dict_tidy.txt: original/%.txt.gz Makefile
+	zcat $< \
+	| iconv --from-code latin1 --to-code utf-8 \
+	| grep --invert-match "^%" \
+	| sed \
+		-e 's/  \+/$(separator)/' \
+		-e 's/\(\(\[\|{\|1\|+\|G\).*\)$(separator)/  \1 /' \
+		-e 's/$(separator)/  /' \
+	> $@
+
+# This Vim regex works, thanks to the ungreedy `\{-}`:
+#
+# :s@\(\(\[\|{\|1\|+\|G\|X\).\{-}\)\(\s\+\)@\3 \1 @c
+#
+# But sed needs to replace the spaces first.
 
 # ----------------------------------------------
 # Convert into CSV (Comma Separated Values)
@@ -227,14 +267,15 @@ tmp/%.txt: original/%.txt.gz Makefile
 # :word2:definition 2
 # -------------------
 
-%.jargon: %.txt
+%.jargon.txt: %.dict_tidy.txt
 	cat $< \
 	| sed \
-		-e 's/\(.*\S\{1,\}\)   *\(.\+\S\) *$$/:\1:\2/' \
+		-e 's/\(.*\S\{1,\}\)   *\(.\+\S\) *$$/:\1:\2:/' \
 		-e 's/\(:\|; \)\([^:;]\{1,\}\)\s\[\([^:;]\{1,\}\)\s]/\1\3 \2/g' \
 		-e 's/\(:\|; \)\([^:;]\{1,\}\)\[\([^:;]\{1,\}\)]/\1\3\2/g' \
 		-e 's/\(\*\?\<1\?+\{0,2\}\*\?G\?X\?\)\([:;]\)/[\1]\2/g' \
 		-e 's/\([:;]\)\([^:;]\+\); \2\([:;]\)/\1\2\3/' \
+		-e 's/:$$//g' \
 	> $@
 
 # ----------------------------------------------
@@ -284,18 +325,20 @@ tmp/%.txt: original/%.txt.gz Makefile
 # ==============================================================
 # Convert to dict and install it
 
-target/$(book)_eng-glosa.dict: tmp/engl.jargon
+target/$(book)_eng-glosa.dict: tmp/engl.jargon.txt
 	dictfmt \
 		--utf8 \
 		--allchars \
+		-u "http://glosa.org" \
 		-s "Glosa Internet Dictionary (English-Glosa)" \
 		-j $(basename $@) \
 		< $<
 
-target/$(book)_glosa-eng.dict: tmp/glen.jargon
+target/$(book)_glosa-eng.dict: tmp/glen.jargon.txt
 	dictfmt \
 		--utf8 \
 		--allchars \
+		-u "http://glosa.org" \
 		-s "Glosa Internet Dictionary (Glosa-English)" \
 		-j $(basename $@) \
 		< $<
@@ -418,6 +461,8 @@ target/$(book).linebreaks.adoc: \
 #
 # 2018-12-11:
 #
-# Convert to dict format. The process is not fully working yet: The description
-# of the Glosa words must be moved to the second field, otherwise it's
+# Convert to dict format. The process is not fully working yet.  The notes
+# about the Glosa words must be moved to the description field, otherwise it's
 # considered part of the word.
+#
+# 2018-12-12: Move the notes about the Glosa words to the description field.

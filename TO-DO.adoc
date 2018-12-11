@@ -49,10 +49,8 @@ And anyway `<?asciidoc-br?>` is not recognized by pandoc.
 
 == 2018-12-11
 
-Fix the conversion to dict: The description of the Glosa words must be
-moved to the second field, otherwise it's considered part of the word.
+Use dictfmt's `--headword-separator` and `--break-headwords`.
 
-Fix: the temporary text files created by `tmp/%.txt: original/%.txt.gz
-Makefile` are removed at the end. Why? This makes the conversions be
-repeated, even when the original data didn't change.
+Improve the conversion to dict: The description of the Glosa words must be
+put in brackets.
 
