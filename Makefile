@@ -2,7 +2,7 @@
 
 # By Marcos Cruz (programandala.net)
 
-# Last modified 201812120057
+# Last modified 201812222318
 # See change log at the end of the file
 
 # ==============================================================
@@ -27,11 +27,22 @@ book=glosa_internet_dictionary
 
 # ----------------------------------------------
 
-# Set the mark which will be added at the start of every entry, in order to
-# facilitate searches in e-books, where regexp are not available. I.e.
+# A temporary field separator.  Any character not used in the original data
+# file is valid.
+#
+# Note: This character must be different from the `bullet` variable.
+
+separator=|
+
+# ----------------------------------------------
+
+# A mark that will be added at the start of every entry, in order to facilitate
+# searches in e-books, where regular expressions are not available. I.e.
 # searching the book for "word" will find the string "word" in any position of
 # the text, including as part of longer words, but searching for ">word" will
 # find only the dictionary entry.
+#
+# Note: This character must be different from the `separator` variable.
 
 bullet=>
 
@@ -110,50 +121,74 @@ html: \
 # ----------------------------------------------
 # Basic tidy
 
-# The encoding of the original data files is changed to UTF-8 (required by all
-# target formats), comment lines are removed and curly brackets are changed to
-# parens.
+# - Change the encoding of the original data files to UTF-8 (as required by all
+#   target formats).
+# - Remove comment lines.
+# - Remove empty lines, just in case.
+# - Fix typo in the description notation of 'akademi': "*1" -> "1*".
+# - Add a field separator at the start of the lines.
+# - Add a field separator between the fields, preceding a semicolon and a space,
+#   in order to mark the start of a definition and make later expressions simpler.
+# - Replace curly brackets with parens.
 
-.SECONDARY: tmp/engl.txt tmp/glen.txt
+.SECONDARY: tmp/engl.tidy_0_basic.txt tmp/glen.tidy_0_basic.txt
 
-tmp/%.txt: original/%.txt.gz Makefile
+tmp/%.tidy_0_basic.txt: original/%.txt.gz Makefile
 	zcat $< \
 	| iconv --from-code latin1 --to-code utf-8 \
 	| grep --invert-match "^%" \
+	| grep --invert-match "^$" \
+	| sed \
+		-e '/akademi/s/\*1+/1+\*/' \
+		-e 's/ \+$$//' \
+		-e 's/^/$(separator)/' \
+		-e 's/  \+/$(separator)/' \
+		-e 's/\($(separator)\|; \)\([^$(separator);]\+\)\[\([^$(separator);]\+\)]/\1\3\2/g' \
+		-e 's/ $(separator)/$(separator)/g' \
+		-e 's/ \(1+\{0,2\}\*\?X\?G\?\)/ [\1]/g' \
+		-e 's/\<\(X\)\($$\|;\)/[\1]\2/g' \
+		-e 's/\<\(G\)\($$\|;\)/[\1]\2/g' \
+		-e 's/\(+\{1,2\}\)$$/[\1]/g' \
+		-e 's/\([$(separator);]\)\([^$(separator);]\+\); \2\([$(separator);]\)/\1\2\3/' \
 	| tr '[{}]' '[()]' > $@
 
+# Description of the `sed` commands:
+#
+# 1: Fix typo in the description of entry 'akademy'.
+#
+# 2: Remove trailing spaces.
+#
+# 3: Add the separator at the start of the lines.
+#
+# 4: Use the separator to separate the fields, instead two or more spaces.
+#
+# 5: Move the second part of the compound expressions, which are in brackets,
+# before their main entry, and remove the brackets.
+#
+# 6: Remove spaces caused by command #5 in some cases.
+#
+# 7: Put the notes about the entry into brackets.
+#
+# 8: Put the notes 'X' alone into brackets (not catched by the command #7).
+#
+# 9: Put the notes 'G' alone into brackets (not catched by the command #7).
+#
+# 10: Put the notes '+/++' alone into brackets (not catched by the command #7).
+#
+# 11: Remove duplicated expressions caused by command #5.
+
 # ----------------------------------------------
-# Special tidy for dict
+# Additional tidy for dict
 
-# The encoding of the original data files is changed to UTF-8 (required by all
-# target formats) and comment lines are removed.
-#
-# Also, the comments in curly brackets are moved from the word to the
-# definition. Otherwise they have to be included in the search term.
+# Move the notes about the word, if any, to the description field.
 
-.SECONDARY: tmp/engl.dict_tidy.txt tmp/glen.dict_tidy.txt
+.SECONDARY: tmp/engl.tidy_1_dict.txt tmp/glen.tidy_1_dict.txt
 
-# XXX UNDER DEVELOPMENT
-
-# A temporary field separator.
-# Any combination of characters which is not in the file is valid.
-separator=ññññ
-
-tmp/%.dict_tidy.txt: original/%.txt.gz Makefile
-	zcat $< \
-	| iconv --from-code latin1 --to-code utf-8 \
-	| grep --invert-match "^%" \
+%.tidy_1_dict.txt: %.tidy_0_basic.txt Makefile
+	cat $< \
 	| sed \
-		-e 's/  \+/$(separator)/' \
-		-e 's/\(\(\[\|{\|1\|+\|G\).*\)$(separator)/  \1 /' \
-		-e 's/$(separator)/  /' \
+		-e 's/ \(\[.\+\]\)$(separator)/$(separator)\1 /' \
 	> $@
-
-# This Vim regex works, thanks to the ungreedy `\{-}`:
-#
-# :s@\(\(\[\|{\|1\|+\|G\|X\).\{-}\)\(\s\+\)@\3 \1 @c
-#
-# But sed needs to replace the spaces first.
 
 # ----------------------------------------------
 # Convert into CSV (Comma Separated Values)
@@ -165,97 +200,18 @@ tmp/%.dict_tidy.txt: original/%.txt.gz Makefile
 # ">word2","definition 2"
 # -------------------
 
-%.csv: %.txt
+%.csv: %.tidy_0_basic.txt
 	cat $< \
 	| sed \
-		-e 's/\(.*\S\{1,\}\)   *\(.\+\S\) *$$/"$(bullet)\1","\2"/' \
-		-e 's/\("\|; \)\([^";]\{1,\}\)\s\[\([^";]\{1,\}\)\s]/\1\3 \2/g' \
-		-e 's/\("\|; \)\([^";]\{1,\}\)\[\([^";]\{1,\}\)]/\1\3\2/g' \
-		-e 's/\(\*\?\<1\?+\{0,2\}\*\?G\?X\?\)\([";]\)/[\1]\2/g' \
-		-e 's/\([";]\)\([^";]\+\); \2\([";]\)/\1\2\3/' \
+		-e 's/^|\([^|]\+\)|\(.\)$$/"\1","\2"/' \
+		-e 's/"/"$(bullet)/' \
 	> $@
 
-# Description of the regular expressions done by `sed`:
+# Description of the `sed` commands:
 #
-# 1: Convert the line (with data separated by two spaces) into a CSV line.
-# 2: Move the words in brackets before their main expression, and remove
-#    the brackets.
-# 3: Idem with the special cases, when there's no space in the brackets,
-#    e.g. parens and hyphens.
-# 4: Put the notation of word's origin in brackets.
-# 5: Remove repeated meanings caused by variants in brackets.
-# 6: Replace notation '(=' with "(→". Temporarily removed, until the
-#    distiction between notations "=" and "prefer" is clear:
-#		-e "s/(=/(→/g" \
-
-# XXX REMARK -- There's a typo in GID: the description of 'akademi' should be
-# '1*' instead of '*1'.
+# 1: Convert the lines to CSV.
 #
-# The 4th regular expression:
-#
-#		-e 's/\<\(1\?+\{0,2\}\*\?G\?X\?\)[";]/[\1]\2"/g' \
-#
-# has been temporarily modified in order to catch that case:
-#
-#		-e 's/\(\*\?\<1\?+\{0,2\}\*\?G\?X\?\)[";]/[\1]\2"/g' \
-
-# XXX REMARK -- This CSV line
-#
-# 	"aito G","burnt brown; brown [burnt ]"
-#
-# becomes this one after moving the parts in brackets:
-#
-# 	"aito [G]","burnt brown; burnt brown"
-#
-# It's goal is to show "burnt brown" under "brown".
-# There are other similar cases. 
-# The repetions must be removed.
-
-# XXX OLD -- Tries:
-#
-# This moves the contents of the brackets to the start of the line:
-#		-e "s/\([\";]\)\(.\+\)\( *\)\[\(.\{1,\}\)]/\1\4\3\2/" \
-#
-# This fails only in some cases:
-#
-#		-e "s/\(.\)\([^\";]\{1,\}\)\( *\)\[\(.\{1,\}\)]/\1\4\3\2/g" \
-#
-# This fails only in some cases, no difference:
-#
-#		-e "s/\(.\)\([^\";]\{1,\}\)\( *\)\[\(.\{1,\}\)]/\1\4\2/g" \
-#
-# This do nothing:
-#
-#		-e "s/\(\(\"\|; \)\{1,\}\)\s\[\(.\{1,\}\)\s]/\2\1/g" \
-#
-# This remove the brackets:
-#
-#		-e "s/\(\"\|; \)\(.\+\)\s\[\(.\{1,\}\)\s]/\1\3\2/g" \
-#
-# This converts brackets separated with spaces, but fails
-# when there are two cases on the same line. Besides, it ignores
-# other brackets, e.g. with hyphens:
-#
-#		-e 's/\("\|; \)\([^";,]\{1,\}\)\s\[\(.\{1,\}\)\s]/\1\3 \2/g' \
-#
-# This works fine with several cases on the same line:
-#
-#		-e 's/\("\|; \)\([^";,]\{1,\}\)\s\[\([^";,]\{1,\}\)\s]/\1\3 \2/g' \
-#
-# This additional command replaces the spaceless brackets, e.g. hyphens,
-# but misses the special case of 'komo' (because it has a comma in the brackets):
-#
-#		-e 's/\("\|; \)\([^";,]\{1,\}\)\[\([^";,]\{1,\}\)]/\1\3\2/g' \
-#
-# This pair of commands replaces all brackets:
-#
-#		-e 's/\("\|; \)\([^";]\{1,\}\)\s\[\([^";]\{1,\}\)\s]/\1\3 \2/g' \
-#
-#		-e 's/\("\|; \)\([^";]\{1,\}\)\[\([^";]\{1,\}\)]/\1\3\2/g' \
-#
-# This combined form ignores the spaceless brackets:
-#
-#		-e 's/\("\|; \)\([^";]\{1,\}\)\(\s\)\?\[\([^";]\{1,\}\)\3]/\1\4\3\2/g' \
+# 2: Add the bullet before the term.
 
 # ----------------------------------------------
 # Convert into Jargon format
@@ -267,29 +223,20 @@ tmp/%.dict_tidy.txt: original/%.txt.gz Makefile
 # :word2:definition 2
 # -------------------
 
-%.jargon.txt: %.dict_tidy.txt
+%.jargon.txt: %.tidy_1_dict.txt
 	cat $< \
 	| sed \
-		-e 's/\(.*\S\{1,\}\)   *\(.\+\S\) *$$/:\1:\2:/' \
-		-e 's/\(:\|; \)\([^:;]\{1,\}\)\s\[\([^:;]\{1,\}\)\s]/\1\3 \2/g' \
-		-e 's/\(:\|; \)\([^:;]\{1,\}\)\[\([^:;]\{1,\}\)]/\1\3\2/g' \
-		-e 's/\(\*\?\<1\?+\{0,2\}\*\?G\?X\?\)\([:;]\)/[\1]\2/g' \
-		-e 's/\([:;]\)\([^:;]\+\); \2\([:;]\)/\1\2\3/' \
-		-e 's/:$$//g' \
+		-e 's/|/:/g' \
 	> $@
 
 # ----------------------------------------------
 # Convert into Asciidoctor unordered lists
 
-%.list.adoc: %.txt
+%.list.adoc: %.tidy_0_basic.txt
 	cat $< \
 	| sed \
-		-e 's/\(.*\S\{1,\}\)   *\(.\+\S\) *$$/\* $(bullet)|\1\|: |\2|/' \
-		-e 's/\(|\|; \)\([^|;]\{1,\}\)\s\[\([^|;]\{1,\}\)\s]/\1\3 \2/g' \
-		-e 's/\(|\|; \)\([^|;]\{1,\}\)\[\([^|;]\{1,\}\)]/\1\3\2/g' \
-		-e 's/\(\*\?\<1\?+\{0,2\}\*\?G\?X\?\)\([|;]\)/[\1]\2/g' \
-		-e 's/\([|;]\)\([^|;]\+\); \2\([|;]\)/\1\2\3/' \
-		-e 's/|//g' \
+		-e 's/^|/- $(bullet)/' \
+		-e 's/|/: /' \
 	> $@
 
 # ----------------------------------------------
@@ -297,29 +244,23 @@ tmp/%.dict_tidy.txt: original/%.txt.gz Makefile
 
 # XXX FIXME -- This does not work. See details in the TO-DO file.
 
-%.linebreak.adoc: %.txt
+%.linebreak.adoc: %.tidy_0_basic.txt
 	cat $< \
 	| sed \
-		-e 's/\(.*\S\{1,\}\)   *\(.\+\S\) *$$/$(bullet)|\1\|: |\2| +/' \
-		-e 's/\(|\|; \)\([^|;]\{1,\}\)\s\[\([^|;]\{1,\}\)\s]/\1\3 \2/g' \
-		-e 's/\(|\|; \)\([^|;]\{1,\}\)\[\([^|;]\{1,\}\)]/\1\3\2/g' \
-		-e 's/\(\*\?\<1\?+\{0,2\}\*\?G\?X\?\)\([|;]\)/[\1]\2/g' \
-		-e 's/\([|;]\)\([^|;]\+\); \2\([|;]\)/\1\2\3/' \
-		-e 's/|//g' \
+		-e 's/^|/$(bullet)/' \
+		-e 's/|/: /' \
+		-e 's/$$/ +/' \
 	> $@
 
 # ----------------------------------------------
 # Convert into Asciidoctor paragraphs
 
-%.paragraph.adoc: %.txt
+%.paragraph.adoc: %.tidy_0_basic.txt
 	cat $< \
 	| sed \
-		-e 's/\(.*\S\{1,\}\)   *\(.\+\S\) *$$/$(bullet)|\1\|: |\2|\n/' \
-		-e 's/\(|\|; \)\([^|;]\{1,\}\)\s\[\([^|;]\{1,\}\)\s]/\1\3 \2/g' \
-		-e 's/\(|\|; \)\([^|;]\{1,\}\)\[\([^|;]\{1,\}\)]/\1\3\2/g' \
-		-e 's/\(\*\?\<1\?+\{0,2\}\*\?G\?X\?\)\([|;]\)/[\1]\2/g' \
-		-e 's/\([|;]\)\([^|;]\+\); \2\([|;]\)/\1\2\3/' \
-		-e 's/|//g' \
+		-e 's/^|/$(bullet)/' \
+		-e 's/|/: /' \
+		-e 's/$$/\n/' \
 	> $@
 
 # ==============================================================
@@ -346,8 +287,8 @@ target/$(book)_glosa-eng.dict: tmp/glen.jargon.txt
 %.dict.dz: %.dict
 	dictzip --force $<
 
-.PHONY: installdict
-installdict: \
+.PHONY: install
+install: \
 	target/$(book)_eng-glosa.dict.dz \
 	target/$(book)_glosa-eng.dict.dz
 	cp --force \
@@ -360,9 +301,9 @@ installdict: \
 # ==============================================================
 # Convert to Asciidoctor
 
-# The Asciidoctor source is simply copied into the target directory.  Its
-# `include::` macros will integrate the CSV files during the translation into
-# DocBook or HTML:
+# The Asciidoctor source is simply copied into the target directory.  During
+# the translation into DocBook or HTML, the Asciidoctor `include::` macros will
+# integrate the data files.
 
 target/$(book).tables.adoc: \
 		tmp/engl.csv \
@@ -466,3 +407,10 @@ target/$(book).linebreaks.adoc: \
 # considered part of the word.
 #
 # 2018-12-12: Move the notes about the Glosa words to the description field.
+#
+# 2018-12-15: Fix the typo of the description notation of 'akademi' in the
+# first tidy. This way later regexp don't need to be modified.
+#
+# 2018-12-22: Finish the rewritting of most rules. Now most operations are done
+# during the first processing of the original data. This makes all later
+# recipes easier.

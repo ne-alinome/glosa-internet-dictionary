@@ -1,6 +1,6 @@
 = TO-DO of _Glosa Internet Directory_
 :author: Marcos Cruz (programandala.net)
-:revdate: 2018-12-11
+:revdate: 2018-12-22
 
 == 2018-12-09
 
@@ -51,6 +51,6 @@ And anyway `<?asciidoc-br?>` is not recognized by pandoc.
 
 Use dictfmt's `--headword-separator` and `--break-headwords`.
 
-Improve the conversion to dict: The description of the Glosa words must be
-put in brackets.
+== 2018-12-22
 
+Fix `((almost) too much)` and `((clock) time)`.

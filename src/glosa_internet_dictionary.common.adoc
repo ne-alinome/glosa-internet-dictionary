@@ -1,7 +1,7 @@
 = Glosa Internet Dictionary
-:revdate: 2018-12-09
+:revdate: 2018-12-22
 
-// Last modified 201812091639
+// Last modified 201812222318
 
 // This text document is written in Asciidoctor format
 // See http://asciidoctor.org
@@ -53,7 +53,7 @@ The dictionary has three levels:
 2. "Basic" (or "Basi", middle)   = marked with `++` and `+`
 3. "Literary" (or "Mega", large) = all words
 
-Suggestion: prefer words with "++", then take "+".
+Suggestion: prefer words with "\+\+", then take "\+".
 
 Other abbreviations:
 
