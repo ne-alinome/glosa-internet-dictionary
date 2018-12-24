@@ -1,0 +1,3 @@
+== English - Glosa
+
+include::../tmp/engl.list.adoc[]

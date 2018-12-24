@@ -1,7 +1,7 @@
-= Glosa Internet Dictionary
-:revdate: 2018-12-22
+// glosa.org & ne.alinome.net
+:revdate: 2018-12-24
 
-// Last modified 201812222318
+// Last modified 201812242316
 
 // This text document is written in Asciidoctor format
 // See http://asciidoctor.org
@@ -9,12 +9,16 @@
 // About this e-book {{{1
 == About this e-book
 
-This book contains a copy of the http://www.glosa.org/gid/[Glosa
-Internet Dictionary], last updated on 2013-04-30 by its current
-maintainer, Marcel Springer.
+This e-book was built from the data of the
+http://www.glosa.org/gid/[Glosa Internet Dictionary], the most
+comprehensive Glosa dictionary.  Its initial goal was to make
+the dictionary easier to use during my studying of Glosa.
 
-The goal of this book was to make the dictionary easier to use during
-my studying of Glosa.
+There are several variants of this e-book, depending on the contents
+(English-Glosa, Glosa-English or both) the layout (tables, lists or
+paragraphs), and the file format (EPUB, HTML and eventually others).
+The latest version of all of them, and the devolopment repository, can
+be found in http://ne.alinome.net[ne alinome].
 
 Marcos Cruz (programandala.net), 2018-12.
 
@@ -39,10 +43,12 @@ with Glosa author Wendy Ashby.
 // Internet Links {{{1
 == Internet Links
 
-- http://www.glosa.org[Information on the Glosa language]
+- http://www.glosa.org[The website about the Glosa language]
 - http://www.glosa.org/gid/[The Glosa Internet Directory]
 - http://www.glosa.org/gid/gidhist.htm[History of the Glosa Internet
   Directory]
+- http://ne.alinome.net[ne alinome], the website of this e-book and
+  other similar Glosa projects.
 
 // Usage {{{1
 == Usage
@@ -57,11 +63,11 @@ Suggestion: prefer words with "\+\+", then take "\+".
 
 Other abbreviations:
 
-`G`:: Glosa words with Greek origin
-`1`:: "Glosa 1000" (words that appear in one of the several "Glosa 1000" lists)
-`*`:: words not original GEO (Clark/Ashby)
+`G`:: words with Greek origin
+`1`:: words that appear in one of the several "Glosa 1000" lists
+`*`:: words not original Glosa Education Organization (Clark/Ashby)
 `1*`:: words slightly modificated from Glosa-1000-words
-`X`:: words to be avoided; in brackets, the prefered synonym
+`X`:: words to be avoided; in parens, the prefered synonym
 `adj`:: adjective
 `n`:: noun
 `v`:: verb

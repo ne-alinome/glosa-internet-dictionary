@@ -1,0 +1,6 @@
+== English - Glosa
+
+[format="csv"]
+|===
+include::../tmp/engl.csv[]
+|===

@@ -1,0 +1,3 @@
+== Glosa - English
+
+include::../tmp/glen.list.adoc[]
