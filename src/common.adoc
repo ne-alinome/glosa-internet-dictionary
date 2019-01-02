@@ -1,7 +1,7 @@
 // glosa.org & ne.alinome.net
 :revdate: 2018-12-24
 
-// Last modified 201812242316
+// Last modified 201812242324
 
 // This text document is written in Asciidoctor format
 // See http://asciidoctor.org
@@ -59,16 +59,19 @@ The dictionary has three levels:
 2. "Basic" (or "Basi", middle)   = marked with `++` and `+`
 3. "Literary" (or "Mega", large) = all words
 
-Suggestion: prefer words with "\+\+", then take "\+".
+Suggestion: prefer words with `++`, then take `+`.
 
-Other abbreviations:
+Abbreviations:
 
-`G`:: words with Greek origin
-`1`:: words that appear in one of the several "Glosa 1000" lists
-`*`:: words not original Glosa Education Organization (Clark/Ashby)
-`1*`:: words slightly modificated from Glosa-1000-words
-`X`:: words to be avoided; in parens, the prefered synonym
-`adj`:: adjective
-`n`:: noun
-`v`:: verb
-
+|===
+| `++`  | words from Core Glosa (first level of the dictionary)
+| `+`   | additional words from Basic Glosa (second level of the dictionary)
+| `1`   | words that appear in one of the several "Glosa 1000" lists
+| `1*`  | words slightly modificated from Glosa-1000-words
+| `*`   | words not original Glosa Education Organization (Clark/Ashby)
+| `X`   | words to be avoided; in parens, the prefered synonym
+| `G`   | words with Greek origin
+| `adj` | adjective
+| `n`   | noun
+| `v`   | verb
+|===
