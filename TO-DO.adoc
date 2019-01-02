@@ -1,6 +1,6 @@
 = TO-DO of _Glosa Internet Directory_
 :author: Marcos Cruz (programandala.net)
-:revdate: 2018-12-22
+:revdate: 2019-01-03
 
 == 2018-12-09
 
@@ -54,3 +54,30 @@ Use dictfmt's `--headword-separator` and `--break-headwords`.
 == 2018-12-22
 
 Fix `((almost) too much)` and `((clock) time)`.
+
+== 2019-01-03
+
+The current dict filenames are too long:
+
+....
+dict -D
+
+gcide      The Collaborative International Dictionary of English v.0.48
+jargon     The Jargon File (version 4.4.7, 29 Dec 2003)
+vera       V.E.R.A. -- Virtual Entity of Relevant Acronyms (June 2006)
+fd-eng-spa English-Spanish Freedict dictionary
+fd-lat-eng Latin-English Freedict dictionary
+fd-eng-lat English-Latin Freedict dictionary
+glosa_internet_dictionary_glosa-eng Glosa Internet Dictionary (Glosa-English)
+fd-spa-eng Spanish-English Freedict dictionary
+glosa_internet_dictionary_eng-glosa Glosa Internet Dictionary (English-Glosa)
+....
+
+Shorten the filenames and the titles:
+
+....
+glosa-eng  Glosa-English Dictionary 
+eng-glosa  English-Glosa Dictionary
+....
+
+
