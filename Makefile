@@ -2,7 +2,7 @@
 
 # By Marcos Cruz (programandala.net)
 
-# Last modified 201901101429
+# Last modified 201901101436
 # See change log at the end of the file
 
 # ==============================================================
@@ -349,6 +349,14 @@ install: \
 	/usr/sbin/dictdconfig --write
 	/etc/init.d/dictd restart
 
+.PHONY: uninstall
+uninstall:
+	rm --force \
+		/usr/share/dictd/$(english_glosa_dict_name).* \
+		/usr/share/dictd/$(glosa_english_dict_name).*
+	/usr/sbin/dictdconfig --write
+	/etc/init.d/dictd restart
+
 # ==============================================================
 # Convert to Asciidoctor
 
@@ -565,4 +573,5 @@ target/$(glosa_english_name).linebreak.adoc: \
 #
 # 2018-12-24: Fix minor regexp. Build only EPUB with paragraphs by default.
 #
-# 2019-01-10: Shorten the filenames and descriptions of the dict files.
+# 2019-01-10: Shorten the filenames and descriptions of the dict files. Add
+# rule to uninstall the dict dictionaries.

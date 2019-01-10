@@ -54,3 +54,8 @@ Use dictfmt's `--headword-separator` and `--break-headwords`.
 == 2018-12-22
 
 Fix `((almost) too much)` and `((clock) time)`.
+
+== 2019-01-10
+
+Fix: Improve `install` to depend on the actual installed files. Now
+the files are built every time.
