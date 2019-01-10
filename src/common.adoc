@@ -1,7 +1,9 @@
 // glosa.org & ne.alinome.net
 :revdate: 2018-12-24
 
-// Last modified 201812242324
+:dot: .
+
+// Last modified 201901101537
 
 // This text document is written in Asciidoctor format
 // See http://asciidoctor.org

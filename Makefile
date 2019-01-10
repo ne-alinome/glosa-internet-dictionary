@@ -2,7 +2,7 @@
 
 # By Marcos Cruz (programandala.net)
 
-# Last modified 201901101436
+# Last modified 201901101545
 # See change log at the end of the file
 
 # ==============================================================
@@ -26,7 +26,7 @@ VPATH=./src:./target:./original
 
 # Base filenames
 
-complete_file=glosa_dictionary
+complete_name=glosa_dictionary
 english_glosa_name=english-glosa_dictionary
 glosa_english_name=glosa-english_dictionary
 english_glosa_dict_name=eng-glosa
@@ -51,7 +51,7 @@ separator=|
 #
 # Note: This character must be different from the `separator` variable.
 
-bullet=.
+bullet={dot}
 
 # ==============================================================
 # Interface
