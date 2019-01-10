@@ -2,15 +2,16 @@
 
 # By Marcos Cruz (programandala.net)
 
-# Last modified 201812242248
+# Last modified 201901101429
 # See change log at the end of the file
 
 # ==============================================================
 # Requirements
 
-# - make
 # - asciidoctor
+# - dictfmt
 # - grep
+# - make
 # - pandoc
 # - tr
 # - sed
@@ -25,9 +26,11 @@ VPATH=./src:./target:./original
 
 # Base filenames
 
-complete_version=glosa_dictionary
-english_glosa_version=english-glosa_dictionary
-glosa_english_version=glosa-english_dictionary
+complete_file=glosa_dictionary
+english_glosa_name=english-glosa_dictionary
+glosa_english_name=glosa-english_dictionary
+english_glosa_dict_name=eng-glosa
+glosa_english_dict_name=glosa-eng
 
 # ----------------------------------------------
 
@@ -43,12 +46,12 @@ separator=|
 # A mark that will be added at the start of every entry, in order to facilitate
 # searches in e-books, where regular expressions are not available. I.e.
 # searching the book for "word" will find the string "word" in any position of
-# the text, including as part of longer words, but searching for ">word" will
+# the text, including as part of longer words, but searching for ".word" will
 # find only the dictionary entry.
 #
 # Note: This character must be different from the `separator` variable.
 
-bullet=>
+bullet=.
 
 # ==============================================================
 # Interface
@@ -71,8 +74,8 @@ jargon: tmp/engl.jargon.txt tmp/glen.jargon.txt
 
 .PHONY: dict
 dict: \
-	target/$(english_glosa_version).dict.dz \
-	target/$(glosa_english_version).dict.dz
+	target/$(english_glosa_dict_name).dict.dz \
+	target/$(glosa_english_dict_name).dict.dz
 
 .PHONY: list
 list: tmp/engl.list.adoc tmp/glen.list.adoc
@@ -88,76 +91,76 @@ epub: epub_with_paragraphs
 
 .PHONY: epub_with_paragraphs
 epub_with_paragraphs: \
-	target/$(complete_version).paragraph.adoc.xml.pandoc.epub \
-	target/$(english_glosa_version).paragraph.adoc.xml.pandoc.epub \
-	target/$(glosa_english_version).paragraph.adoc.xml.pandoc.epub
+	target/$(complete_name).paragraph.adoc.xml.pandoc.epub \
+	target/$(english_glosa_name).paragraph.adoc.xml.pandoc.epub \
+	target/$(glosa_english_name).paragraph.adoc.xml.pandoc.epub
 
 .PHONY: epub_with_lists
 epub_with_lists: \
-	target/$(complete_version).list.adoc.xml.pandoc.epub \
-	target/$(english_glosa_version).list.adoc.xml.pandoc.epub \
-	target/$(glosa_english_version).list.adoc.xml.pandoc.epub
+	target/$(complete_name).list.adoc.xml.pandoc.epub \
+	target/$(english_glosa_name).list.adoc.xml.pandoc.epub \
+	target/$(glosa_english_name).list.adoc.xml.pandoc.epub
 
 .PHONY: epub_with_tables
 epub_with_tables: \
-	target/$(complete_version).table.adoc.xml.pandoc.epub \
-	target/$(english_glosa_version).table.adoc.xml.pandoc.epub \
-	target/$(glosa_english_version).table.adoc.xml.pandoc.epub
+	target/$(complete_name).table.adoc.xml.pandoc.epub \
+	target/$(english_glosa_name).table.adoc.xml.pandoc.epub \
+	target/$(glosa_english_name).table.adoc.xml.pandoc.epub
 
 # XXX TODO --
-#	target/$(complete_version).linebreak.adoc.xml.pandoc.epub
+#	target/$(complete_name).linebreak.adoc.xml.pandoc.epub
 
 .PHONY: html
 html: html_with_lists
 
 .PHONY: html_with_paragraphs
 html_with_paragraphs: \
-	target/$(complete_version).paragraph.adoc.html \
-	target/$(complete_version).paragraph.adoc.plain.html \
-	target/$(complete_version).paragraph.adoc.xml.pandoc.html \
-	target/$(english_glosa_version).paragraph.adoc.html \
-	target/$(english_glosa_version).paragraph.adoc.plain.html \
-	target/$(english_glosa_version).paragraph.adoc.xml.pandoc.html \
-	target/$(glosa_english_version).paragraph.adoc.html \
-	target/$(glosa_english_version).paragraph.adoc.plain.html \
-	target/$(glosa_english_version).paragraph.adoc.xml.pandoc.html
+	target/$(complete_name).paragraph.adoc.html \
+	target/$(complete_name).paragraph.adoc.plain.html \
+	target/$(complete_name).paragraph.adoc.xml.pandoc.html \
+	target/$(english_glosa_name).paragraph.adoc.html \
+	target/$(english_glosa_name).paragraph.adoc.plain.html \
+	target/$(english_glosa_name).paragraph.adoc.xml.pandoc.html \
+	target/$(glosa_english_name).paragraph.adoc.html \
+	target/$(glosa_english_name).paragraph.adoc.plain.html \
+	target/$(glosa_english_name).paragraph.adoc.xml.pandoc.html
 
 .PHONY: html_with_lists
 html_with_lists: \
-	target/$(complete_version).list.adoc.html \
-	target/$(complete_version).list.adoc.plain.html \
-	target/$(complete_version).list.adoc.xml.pandoc.html \
-	target/$(english_glosa_version).list.adoc.html \
-	target/$(english_glosa_version).list.adoc.plain.html \
-	target/$(english_glosa_version).list.adoc.xml.pandoc.html \
-	target/$(glosa_english_version).list.adoc.html \
-	target/$(glosa_english_version).list.adoc.plain.html \
-	target/$(glosa_english_version).list.adoc.xml.pandoc.html
+	target/$(complete_name).list.adoc.html \
+	target/$(complete_name).list.adoc.plain.html \
+	target/$(complete_name).list.adoc.xml.pandoc.html \
+	target/$(english_glosa_name).list.adoc.html \
+	target/$(english_glosa_name).list.adoc.plain.html \
+	target/$(english_glosa_name).list.adoc.xml.pandoc.html \
+	target/$(glosa_english_name).list.adoc.html \
+	target/$(glosa_english_name).list.adoc.plain.html \
+	target/$(glosa_english_name).list.adoc.xml.pandoc.html
 
 .PHONY: html_with_tables
 html_with_tables: \
-	target/$(complete_version).table.adoc.html \
-	target/$(complete_version).table.adoc.plain.html \
-	target/$(complete_version).table.adoc.xml.pandoc.html \
-	target/$(english_glosa_version).table.adoc.html \
-	target/$(english_glosa_version).table.adoc.plain.html \
-	target/$(english_glosa_version).table.adoc.xml.pandoc.html \
-	target/$(glosa_english_version).table.adoc.html \
-	target/$(glosa_english_version).table.adoc.plain.html \
-	target/$(glosa_english_version).table.adoc.xml.pandoc.html
+	target/$(complete_name).table.adoc.html \
+	target/$(complete_name).table.adoc.plain.html \
+	target/$(complete_name).table.adoc.xml.pandoc.html \
+	target/$(english_glosa_name).table.adoc.html \
+	target/$(english_glosa_name).table.adoc.plain.html \
+	target/$(english_glosa_name).table.adoc.xml.pandoc.html \
+	target/$(glosa_english_name).table.adoc.html \
+	target/$(glosa_english_name).table.adoc.plain.html \
+	target/$(glosa_english_name).table.adoc.xml.pandoc.html
 
 # XXX TODO --
 #.PHONY: html_with_linebreaks
 #html_with_linebreaks: \
-#	target/$(complete_version).linebreak.adoc.html \
-#	target/$(complete_version).linebreak.adoc.plain.html \
-#	target/$(complete_version).linebreak.adoc.xml.pandoc.html \
-#	target/$(english_glosa_version).linebreak.adoc.html \
-#	target/$(english_glosa_version).linebreak.adoc.plain.html \
-#	target/$(english_glosa_version).linebreak.adoc.xml.pandoc.html \
-#	target/$(glosa_english_version).linebreak.adoc.html \
-#	target/$(glosa_english_version).linebreak.adoc.plain.html \
-#	target/$(glosa_english_version).linebreak.adoc.xml.pandoc.html
+#	target/$(complete_name).linebreak.adoc.html \
+#	target/$(complete_name).linebreak.adoc.plain.html \
+#	target/$(complete_name).linebreak.adoc.xml.pandoc.html \
+#	target/$(english_glosa_name).linebreak.adoc.html \
+#	target/$(english_glosa_name).linebreak.adoc.plain.html \
+#	target/$(english_glosa_name).linebreak.adoc.xml.pandoc.html \
+#	target/$(glosa_english_name).linebreak.adoc.html \
+#	target/$(glosa_english_name).linebreak.adoc.plain.html \
+#	target/$(glosa_english_name).linebreak.adoc.xml.pandoc.html
 
 # ==============================================================
 # Convert the original data files
@@ -314,21 +317,21 @@ tmp/%.tidy_0_basic.txt: original/%.txt.gz Makefile
 # ==============================================================
 # Convert to dict and install it
 
-target/$(english_glosa_version).dict: tmp/engl.jargon.txt
+target/$(english_glosa_dict_name).dict: tmp/engl.jargon.txt
 	dictfmt \
 		--utf8 \
 		--allchars \
 		-u "http://glosa.org" \
-		-s "Glosa Internet Dictionary (English-Glosa)" \
+		-s "English-Glosa Dictionary" \
 		-j $(basename $@) \
 		< $<
 
-target/$(glosa_english_version).dict: tmp/glen.jargon.txt
+target/$(glosa_english_dict_name).dict: tmp/glen.jargon.txt
 	dictfmt \
 		--utf8 \
 		--allchars \
 		-u "http://glosa.org" \
-		-s "Glosa Internet Dictionary (Glosa-English)" \
+		-s "Glosa-English Dictionary" \
 		-j $(basename $@) \
 		< $<
 
@@ -337,8 +340,8 @@ target/$(glosa_english_version).dict: tmp/glen.jargon.txt
 
 .PHONY: install
 install: \
-	target/$(english_glosa_version).dict.dz \
-	target/$(glosa_english_version).dict.dz
+	target/$(english_glosa_dict_name).dict.dz \
+	target/$(glosa_english_dict_name).dict.dz
 	cp --force \
 		$^ \
 		$(addsuffix .index, $(basename $(basename $^))) \
@@ -352,127 +355,127 @@ install: \
 #  ---------------------------------------------
 #  Complete versions
 
-target/$(complete_version).table.adoc: \
+target/$(complete_name).table.adoc: \
 		tmp/engl.csv \
 		tmp/glen.csv \
-		src/$(complete_version).title.adoc \
+		src/$(complete_name).title.adoc \
 		src/common.adoc
 	cat \
-		src/$(complete_version).title.adoc \
+		src/$(complete_name).title.adoc \
 		src/common.adoc \
-		src/$(english_glosa_version).table.adoc \
-		src/$(glosa_english_version).table.adoc > $@
+		src/$(english_glosa_name).table.adoc \
+		src/$(glosa_english_name).table.adoc > $@
 
-target/$(complete_version).list.adoc: \
+target/$(complete_name).list.adoc: \
 		tmp/engl.list.adoc \
 		tmp/glen.list.adoc \
-		src/$(complete_version).title.adoc \
+		src/$(complete_name).title.adoc \
 		src/common.adoc
 	cat \
-		src/$(complete_version).title.adoc \
+		src/$(complete_name).title.adoc \
 		src/common.adoc \
-		src/$(english_glosa_version).list.adoc \
-		src/$(glosa_english_version).list.adoc > $@
+		src/$(english_glosa_name).list.adoc \
+		src/$(glosa_english_name).list.adoc > $@
 
-target/$(complete_version).paragraph.adoc: \
+target/$(complete_name).paragraph.adoc: \
 		tmp/engl.paragraph.adoc \
 		tmp/glen.paragraph.adoc \
-		src/$(complete_version).title.adoc \
+		src/$(complete_name).title.adoc \
 		src/common.adoc
 	cat \
-		src/$(complete_version).title.adoc \
+		src/$(complete_name).title.adoc \
 		src/common.adoc \
-		src/$(english_glosa_version).paragraph.adoc \
-		src/$(glosa_english_version).paragraph.adoc > $@
+		src/$(english_glosa_name).paragraph.adoc \
+		src/$(glosa_english_name).paragraph.adoc > $@
 
-target/$(complete_version).linebreak.adoc: \
+target/$(complete_name).linebreak.adoc: \
 		tmp/engl.linebreak.adoc \
 		tmp/glen.linebreak.adoc \
-		src/$(complete_version).title.adoc \
+		src/$(complete_name).title.adoc \
 		src/common.adoc
 	cat \
-		src/$(complete_version).title.adoc \
+		src/$(complete_name).title.adoc \
 		src/common.adoc \
-		src/$(english_glosa_version).linebreak.adoc \
-		src/$(glosa_english_version).linebreak.adoc > $@
+		src/$(english_glosa_name).linebreak.adoc \
+		src/$(glosa_english_name).linebreak.adoc > $@
 
 #  ---------------------------------------------
 #  English-Glosa versions
 
-target/$(english_glosa_version).table.adoc: \
+target/$(english_glosa_name).table.adoc: \
 		tmp/engl.csv \
-		src/$(english_glosa_version).title.adoc \
+		src/$(english_glosa_name).title.adoc \
 		src/common.adoc
 	cat \
-		src/$(english_glosa_version).title.adoc \
+		src/$(english_glosa_name).title.adoc \
 		src/common.adoc \
-		src/$(english_glosa_version).table.adoc > $@
+		src/$(english_glosa_name).table.adoc > $@
 
-target/$(english_glosa_version).list.adoc: \
+target/$(english_glosa_name).list.adoc: \
 		tmp/engl.list.adoc \
-		src/$(english_glosa_version).title.adoc \
+		src/$(english_glosa_name).title.adoc \
 		src/common.adoc
 	cat \
-		src/$(english_glosa_version).title.adoc \
+		src/$(english_glosa_name).title.adoc \
 		src/common.adoc \
-		src/$(english_glosa_version).list.adoc > $@
+		src/$(english_glosa_name).list.adoc > $@
 
-target/$(english_glosa_version).paragraph.adoc: \
+target/$(english_glosa_name).paragraph.adoc: \
 		tmp/engl.paragraph.adoc \
-		src/$(english_glosa_version).title.adoc \
+		src/$(english_glosa_name).title.adoc \
 		src/common.adoc
 	cat \
-		src/$(english_glosa_version).title.adoc \
+		src/$(english_glosa_name).title.adoc \
 		src/common.adoc \
-		src/$(english_glosa_version).paragraph.adoc > $@
+		src/$(english_glosa_name).paragraph.adoc > $@
 
-target/$(english_glosa_version).linebreak.adoc: \
+target/$(english_glosa_name).linebreak.adoc: \
 		tmp/engl.linebreak.adoc \
-		src/$(english_glosa_version).title.adoc \
+		src/$(english_glosa_name).title.adoc \
 		src/common.adoc
 	cat \
-		src/$(english_glosa_version).title.adoc
+		src/$(english_glosa_name).title.adoc
 		src/common.adoc \
-		src/$(english_glosa_version).linebreak.adoc > $@
+		src/$(english_glosa_name).linebreak.adoc > $@
 
 #  ---------------------------------------------
 #  Glosa-English versions
 
-target/$(glosa_english_version).table.adoc: \
+target/$(glosa_english_name).table.adoc: \
 		tmp/glen.csv \
-		src/$(glosa_english_version).title.adoc \
+		src/$(glosa_english_name).title.adoc \
 		src/common.adoc
 	cat \
-		src/$(glosa_english_version).title.adoc \
+		src/$(glosa_english_name).title.adoc \
 		src/common.adoc \
-		src/$(glosa_english_version).table.adoc > $@
+		src/$(glosa_english_name).table.adoc > $@
 
-target/$(glosa_english_version).list.adoc: \
+target/$(glosa_english_name).list.adoc: \
 		tmp/glen.list.adoc \
-		src/$(glosa_english_version).title.adoc \
+		src/$(glosa_english_name).title.adoc \
 		src/common.adoc
 	cat \
-		src/$(glosa_english_version).title.adoc \
+		src/$(glosa_english_name).title.adoc \
 		src/common.adoc \
-		src/$(glosa_english_version).list.adoc > $@
+		src/$(glosa_english_name).list.adoc > $@
 
-target/$(glosa_english_version).paragraph.adoc: \
+target/$(glosa_english_name).paragraph.adoc: \
 		tmp/glen.paragraph.adoc \
-		src/$(glosa_english_version).title.adoc \
+		src/$(glosa_english_name).title.adoc \
 		src/common.adoc
 	cat \
-		src/$(glosa_english_version).title.adoc \
+		src/$(glosa_english_name).title.adoc \
 		src/common.adoc \
-		src/$(glosa_english_version).paragraph.adoc > $@
+		src/$(glosa_english_name).paragraph.adoc > $@
 
-target/$(glosa_english_version).linebreak.adoc: \
+target/$(glosa_english_name).linebreak.adoc: \
 		tmp/glen.linebreak.adoc \
-		src/$(glosa_english_version).title.adoc \
+		src/$(glosa_english_name).title.adoc \
 		src/common.adoc
 	cat \
-		src/$(glosa_english_version).title.adoc \
+		src/$(glosa_english_name).title.adoc \
 		src/common.adoc \
-		src/$(glosa_english_version).linebreak.adoc > $@
+		src/$(glosa_english_name).linebreak.adoc > $@
 
 # ==============================================================
 # Convert to DocBook
@@ -561,3 +564,5 @@ target/$(glosa_english_version).linebreak.adoc: \
 # recipes easier.
 #
 # 2018-12-24: Fix minor regexp. Build only EPUB with paragraphs by default.
+#
+# 2019-01-10: Shorten the filenames and descriptions of the dict files.
